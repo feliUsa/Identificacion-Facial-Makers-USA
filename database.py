@@ -1,5 +1,10 @@
 import mysql.connector as db
 import json
+import logging
+
+# Configuración del logger
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 with open('conexion.json') as json_file:
     keys = json.load(json_file)
@@ -19,7 +24,7 @@ def convertToBinaryData(filename):
             binaryData = file.read()
         return binaryData
     except Exception as e:
-        print(f"Error al convertir archivo a binario: {e}")
+        logger.error(f"Error al convertir archivo a binario: {e}")
         return None
 
 def write_file(data, path):
@@ -34,7 +39,7 @@ def write_file(data, path):
         with open(path, 'wb') as file:
             file.write(data)
     except Exception as e:
-        print(f"Error al escribir archivo: {e}")
+        logger.error(f"Error al escribir archivo: {e}")
 
 def registerUser(name, photo):
     ''' 
@@ -61,7 +66,7 @@ def registerUser(name, photo):
             inserted = cursor.rowcount
             id = cursor.lastrowid
     except db.Error as e:
-        print(f"Failed inserting image: {e}")
+        logger.error(f"Failed inserting image: {e}")
     finally:
         if con.is_connected():
             cursor.close()
@@ -82,18 +87,18 @@ def getUser(name, path):
     id = 0
     rows = 0
     try:
-        con = db.connect(host=keys["host"], user=keys["user"], password=keys["password"], database=keys["database"])
+        con = get_db_connection()
         cursor = con.cursor()
         sql = "SELECT * FROM usuarios WHERE name = %s"
         cursor.execute(sql, (name,))
         records = cursor.fetchall()
 
-        for row in records: # Escribir la foto
+        for row in records:
             id = row[0]
             write_file(row[2], path)
         rows = len(records)
     except db.Error as e:
-        print(f"Failed to read image: {e}")
+        logger.error(f"Failed to read image: {e}")
     finally:
         if con.is_connected():
             cursor.close()
@@ -101,4 +106,14 @@ def getUser(name, path):
     return {"id": id, "affected": rows}
 
 def get_db_connection():
-    return db.connect(host=keys["host"], user=keys["user"], password=keys["password"], database=keys["database"])
+    try:
+        connection = db.connect(
+            host=keys["host"], 
+            user=keys["user"], 
+            password=keys["password"], 
+            database=keys["database"]
+        )
+        return connection
+    except db.Error as e:
+        logger.error(f"Error connecting to database: {e}")
+        return None
