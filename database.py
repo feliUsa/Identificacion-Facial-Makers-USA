@@ -50,7 +50,7 @@ def registerUser(name, photo):
     id = 0
     inserted = 0
     try:
-        con = db.connect(host=keys["host"], user=keys["user"], password=keys["password"], database=keys["database"])
+        con = get_db_connection()
         cursor = con.cursor()
         sql = "INSERT INTO usuarios(name, photo) VALUES (%s, %s)"
         pic = convertToBinaryData(photo)
@@ -99,3 +99,6 @@ def getUser(name, path):
             cursor.close()
             con.close()
     return {"id": id, "affected": rows}
+
+def get_db_connection():
+    return db.connect(host=keys["host"], user=keys["user"], password=keys["password"], database=keys["database"])
