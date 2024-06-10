@@ -112,11 +112,24 @@ def capture_image(window_name, img_path):
     img_path (str): La ruta donde se guardará la imagen capturada.
     '''
     cap = cv2.VideoCapture(0)
+    cv2.namedWindow(window_name)
+
     while True:
         ret, frame = cap.read()
-        cv2.imshow(window_name, frame)
-        if cv2.waitKey(1) == 27:  # Presiona 'ESC' para capturar
+        if not ret:
+            print("Error al acceder a la cámara.")
             break
-    cv2.imwrite(img_path, frame)
+        
+        cv2.imshow(window_name, frame)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == 32:  # Código de la tecla Espacio
+            cv2.imwrite(img_path, frame)
+            print(f"Imagen guardada en {img_path}")
+            break
+        elif key == 27:  # Código de la tecla ESC
+            print("Captura cancelada.")
+            break
+
     cap.release()
     cv2.destroyAllWindows()

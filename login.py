@@ -2,11 +2,11 @@ from tkinter import *
 import os
 import cv2
 import imageio
-
+import face_recognition
+from deepface import DeepFace
 from mtcnn.mtcnn import MTCNN
 import database as db
 import utils as ut
-
 
 path = "/home/daniel/Universidad/Semillero/faceRecognition"
 color_success = "\033[1;32;40m"
@@ -63,20 +63,21 @@ def login_capture(user_login, user_entry2, screen2):
     if res_db["affected"]:
         my_files = os.listdir()  # Lista los archivos en el directorio actual
         if img_user in my_files:
-            # Lee la imagen del registro en escala de grises
-            face_reg = cv2.imread(img_user, 0)
-            # Lee la imagen del login en escala de grises
-            face_log = cv2.imread(img_path, 0)
+            # Comparar utilizando ORB
+            comp_orb = compatibility(cv2.imread(img_user, 0), cv2.imread(img_path, 0))
+            # Comparar utilizando DeepFace
+            verified_deepface, distance_deepface = compatibility_deepface(img_user, img_path)
+            # Comparar utilizando face_recognition
+            verified_face_recognition = compatibility_face_recognition(img_user, img_path)
 
-            comp = compatibility(face_reg, face_log)  # Compara las imgs
-
-            if comp >= 0.94:
-                print("{}Compatibilidad del {:.1%}{}".format(
-                    color_success, float(comp), color_normal))
+            # Actualizar las condiciones de acceso
+            if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.90 and verified_deepface and verified_face_recognition):
+                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
+                    color_success, float(comp_orb), verified_deepface, verified_face_recognition, color_normal))
                 ut.printAndShow(screen2, f"Bienvenido, {user_login}", True)
             else:
-                print("{}Compatibilidad del {:.1%}{}".format(
-                    color_error, float(comp), color_normal))
+                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
+                    color_error, float(comp_orb), verified_deepface, verified_face_recognition, color_normal))
                 ut.printAndShow(screen2, "Incompatibilidad de datos", False)
             os.remove(img_user)  # Elimina la imagen temporal
 
@@ -85,3 +86,47 @@ def login_capture(user_login, user_entry2, screen2):
     else:
         ut.printAndShow(screen2, "Usuario no ha sido encontrado", False)
     os.remove(img_path)  # Elimina la imagen temporal
+
+
+def compatibility_deepface(img1_path, img2_path):
+    ''' 
+    Compara dos imágenes de caras usando DeepFace con diferentes modelos.
+
+    Parameters:
+    img1_path (str): La ruta de la primera imagen.
+    img2_path (str): La ruta de la segunda imagen.
+
+    Returns:
+    bool: True si alguna verificación es exitosa, False en caso contrario.
+    '''
+    models = ['VGG-Face', 'Facenet', 'OpenFace', 'DeepFace', 'DeepID']
+    for model in models:
+        try:
+            result = DeepFace.verify(img1_path, img2_path, model_name=model, enforce_detection=False)
+            if result["verified"]:
+                return True, result["distance"]
+        except Exception as e:
+            print(f"Error loading model {model}: {e}")
+    return False, None
+
+
+def compatibility_face_recognition(img1_path, img2_path):
+    ''' 
+    Compara dos imágenes de caras usando face_recognition.
+
+    Parameters:
+    img1_path (str): La ruta de la primera imagen.
+    img2_path (str): La ruta de la segunda imagen.
+
+    Returns:
+    bool: True si las imágenes coinciden, False en caso contrario.
+    '''
+    img1 = face_recognition.load_image_file(img1_path)
+    img2 = face_recognition.load_image_file(img2_path)
+
+    encodings1 = face_recognition.face_encodings(img1)
+    encodings2 = face_recognition.face_encodings(img2)
+
+    if len(encodings1) > 0 and len(encodings2) > 0:
+        return face_recognition.compare_faces([encodings1[0]], encodings2[0])[0]
+    return False
