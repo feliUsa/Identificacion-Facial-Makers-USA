@@ -81,7 +81,7 @@ def login_capture(user_login, user_entry2, screen2):
                 img_user, img_path)
 
             # Condiciones de acceso
-            if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.90 and verified_deepface and verified_face_recognition):
+            if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.86 and verified_deepface and verified_face_recognition):
                 print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
                     success, float(comp_orb), verified_deepface, verified_face_recognition, base))
                 ut.printAndShow(screen2, f"Bienvenido, {user_login}", True)
