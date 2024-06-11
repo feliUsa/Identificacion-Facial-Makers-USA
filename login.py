@@ -9,9 +9,9 @@ import database as db
 import utils as ut
 
 path = "/home/daniel/Universidad/Semillero/faceRecognition"
-color_success = "\033[1;32;40m"
-color_error = "\033[1;31;40m"
-color_normal = "\033[0;37;40m"
+success = "\033[1;32;40m"
+error = "\033[1;31;40m"
+base = "\033[0;36;40m"
 
 
 def compatibility(img1, img2):
@@ -83,11 +83,11 @@ def login_capture(user_login, user_entry2, screen2):
             # Condiciones de acceso
             if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.90 and verified_deepface and verified_face_recognition):
                 print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
-                    color_success, float(comp_orb), verified_deepface, verified_face_recognition, color_normal))
+                    success, float(comp_orb), verified_deepface, verified_face_recognition, base))
                 ut.printAndShow(screen2, f"Bienvenido, {user_login}", True)
             else:
                 print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
-                    color_error, float(comp_orb), verified_deepface, verified_face_recognition, color_normal))
+                    error, float(comp_orb), verified_deepface, verified_face_recognition, base))
                 ut.printAndShow(screen2, "Incompatibilidad de datos", False)
             os.remove(img_user)  # Elimina la imagen temporal
 

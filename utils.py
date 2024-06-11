@@ -1,19 +1,19 @@
 from tkinter import *
 from tkinter import messagebox as msg
-import matplotlib as plt
 import cv2
 import imageio
 
 
-color_white = "#f4f5f4"
-color_black = "#101010"
-color_black_btn = "#202020"
-color_background = "#151515"
-font_label = "Arial"
+blanco = "#FFFFFF"
+negro = "#000000"
+btn_negro = "#383636"
+fondo = "#575454"
+fuente = "Arial"
 size_screen = "500x300"
-color_success = "\033[1;32;40m"
-color_error = "\033[1;31;40m"
-color_normal = "\033[0;37;40m"
+success = "\033[1;32;40m"
+error = "\033[1;31;40m"
+base = "\033[0;36;40m"
+
 
 
 def getEnter(screen):
@@ -23,7 +23,7 @@ def getEnter(screen):
     Parametros:
     screen (Tkinter.Toplevel): La pantalla donde se agregará el espacio.
     '''
-    Label(screen, text="", bg=color_background).pack()
+    Label(screen, text="", bg=fondo).pack()
 
 
 def printAndShow(screen, text, flag):
@@ -36,13 +36,13 @@ def printAndShow(screen, text, flag):
     flag (bool): Indica si el mensaje es de éxito (True) o de error (False).
     '''
     if flag:
-        print(color_success + text + color_normal)
+        print(success + text + base)
         screen.destroy()
         msg.showinfo(message=text, title="¡Éxito!")
     else:
-        print(color_error + text + color_normal)
-        Label(screen, text=text, fg="red", bg=color_background,
-              font=(font_label, 12)).pack()
+        print(error + text + base)
+        Label(screen, text=text, fg="red", bg=fondo,
+              font=(fuente, 12)).pack()
 
 
 def configure_screen(screen, text):
@@ -55,9 +55,9 @@ def configure_screen(screen, text):
     '''
     screen.title(text)
     screen.geometry(size_screen)
-    screen.configure(bg=color_background)
-    Label(screen, text=f"¡{text}!", fg=color_white, bg=color_black, font=(
-        font_label, 18), width="500", height="2").pack()
+    screen.configure(bg=fondo)
+    Label(screen, text=f"¡{text}!", fg=blanco, bg=negro, font=(
+        fuente, 18), width="500", height="2").pack()
 
 
 def credentials(screen, var, command):
@@ -72,16 +72,16 @@ def credentials(screen, var, command):
     Return:
     Tkinter.Entry: La entrada de usuario configurada.
     '''
-    Label(screen, text="Usuario:", fg=color_white,
-          bg=color_background, font=(font_label, 12)).pack()
+    Label(screen, text="Usuario:", fg=blanco,
+          bg=fondo, font=(fuente, 12)).pack()
     entry = Entry(screen, textvariable=var,
-                  justify=CENTER, font=(font_label, 12))
+                  justify=CENTER, font=(fuente, 12))
     entry.focus_force()
     entry.pack(side=TOP, ipadx=30, ipady=6)
 
     getEnter(screen)
-    Button(screen, text="Capturar rostro", fg=color_white, bg=color_black_btn, activebackground=color_background,
-           borderwidth=0, font=(font_label, 14), height="2", width="40", command=command).pack()
+    Button(screen, text="Capturar rostro", fg=blanco, bg=btn_negro, activebackground=fondo,
+           borderwidth=0, font=(fuente, 14), height="2", width="40", command=command).pack()
     return entry
 
 

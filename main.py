@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Toplevel, StringVar
+from tkinter import *
 import utils as ut
 import registro as reg
 import login as log
@@ -6,11 +6,11 @@ import login as log
 size_screen = "500x300"
 txt_login = "Iniciar Sesión"
 txt_register = "Registrarse"
-color_white = "#f4f5f4"
-color_black = "#101010"
-color_black_btn = "#202020"
-color_background = "#151515"
-font_label = "Arial"
+blanco = "#FFFFFF"
+negro = "#000000"
+btn_negro = "#383636"
+fondo = "#575454"
+fuente = "Arial"
 
 
 def register():
@@ -49,20 +49,20 @@ def login():
 root = Tk()
 root.geometry(size_screen)
 root.title("AVM")
-root.configure(bg=color_background)
-Label(text="¡Bienvenido(a)!", fg=color_white, bg=color_black,
-      font=(font_label, 18), width="500", height="2").pack()
+root.configure(bg=fondo)
+Label(text="¡Bienvenido(a)!", fg=blanco, bg=negro,
+      font=(fuente, 18), width="500", height="2").pack()
 
 ut.getEnter(root)
 
 # Registro
-Button(text=txt_login, fg=color_white, bg=color_black_btn, activebackground=color_background,
-       borderwidth=0, font=(font_label, 14), height="2", width="40", command=login).pack()
+Button(text=txt_login, fg=blanco, bg=btn_negro, activebackground=fondo,
+       borderwidth=0, font=(fuente, 14), height="2", width="40", command=login).pack()
 
 ut.getEnter(root)
 
 # Login
-Button(text=txt_register, fg=color_white, bg=color_black_btn, activebackground=color_background,
-       borderwidth=0, font=(font_label, 14), height="2", width="40", command=register).pack()
+Button(text=txt_register, fg=blanco, bg=btn_negro, activebackground=fondo,
+       borderwidth=0, font=(fuente, 14), height="2", width="40", command=register).pack()
 
 root.mainloop()
