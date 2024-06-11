@@ -54,14 +54,10 @@ def login_capture(user_login, user_entry2, screen2):
     img_path = os.path.join(path, img)
     img_user = f"{user_login}.jpg"
 
-    ut.capture_image("Login Facial", img_path)
+    ut.capture_image_mediapipe("Login Facial", img_path)
 
     user_entry2.delete(0, END)  # Limpiar la entrada
 
-    pixels = imageio.imread(img_path)
-    faces = MTCNN().detect_faces(pixels)  # Detectar caras en img_path
-
-    ut.face(img_path, faces)
     ut.getEnter(screen2)
 
     # Obtiene el usuario de la base de datos
@@ -80,14 +76,20 @@ def login_capture(user_login, user_entry2, screen2):
             verified_face_recognition = compatibility_face_recognition(
                 img_user, img_path)
 
+            # Añadimos una verificación adicional con MediaPipe
+            faces = ut.detect_faces_mediapipe(img_path)
+            verified_mediapipe = len(faces) > 0
+
             # Condiciones de acceso
-            if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.86 and verified_deepface and verified_face_recognition):
-                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
-                    success, float(comp_orb), verified_deepface, verified_face_recognition, base))
+            if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition or verified_mediapipe)) or \
+                (comp_orb >= 0.90 and verified_deepface and verified_face_recognition and verified_mediapipe) or \
+                (verified_deepface and verified_face_recognition and verified_mediapipe):
+                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}, MediaPipe: {}{}".format(
+                    success, float(comp_orb), verified_deepface, verified_face_recognition, verified_mediapipe, base))
                 ut.printAndShow(screen2, f"Bienvenido, {user_login}", True)
             else:
-                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
-                    error, float(comp_orb), verified_deepface, verified_face_recognition, base))
+                print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}, MediaPipe: {}{}".format(
+                    error, float(comp_orb), verified_deepface, verified_face_recognition, verified_mediapipe, base))
                 ut.printAndShow(screen2, "Incompatibilidad de datos", False)
             os.remove(img_user)  # Elimina la imagen temporal
 
