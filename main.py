@@ -25,7 +25,7 @@ def register():
     user1 = StringVar()
 
     ut.configure_screen(screen1, txt_register)
-    user_entry1 = ut.credentials(screen1, user1, False, lambda: reg.register_capture(
+    user_entry1 = ut.credentials(screen1, user1, lambda: reg.register_capture(
         user1.get(), user_entry1, screen1))
 
 
@@ -41,10 +41,11 @@ def login():
     user2 = StringVar()
 
     ut.configure_screen(screen2, txt_login)
-    user_entry2 = ut.credentials(screen2, user2, True, lambda: log.login_capture(
+    user_entry2 = ut.credentials(screen2, user2, lambda: log.login_capture(
         user2.get(), user_entry2, screen2))
 
 
+# Ventana principal
 root = Tk()
 root.geometry(size_screen)
 root.title("AVM")
@@ -53,10 +54,14 @@ Label(text="¡Bienvenido(a)!", fg=color_white, bg=color_black,
       font=(font_label, 18), width="500", height="2").pack()
 
 ut.getEnter(root)
+
+# Registro
 Button(text=txt_login, fg=color_white, bg=color_black_btn, activebackground=color_background,
        borderwidth=0, font=(font_label, 14), height="2", width="40", command=login).pack()
 
 ut.getEnter(root)
+
+# Login
 Button(text=txt_register, fg=color_white, bg=color_black_btn, activebackground=color_background,
        borderwidth=0, font=(font_label, 14), height="2", width="40", command=register).pack()
 

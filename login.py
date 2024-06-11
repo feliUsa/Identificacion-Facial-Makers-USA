@@ -18,7 +18,7 @@ def compatibility(img1, img2):
     ''' 
     Compara dos imágenes de caras usando ORB.
 
-    Parameters:
+    Parametros:
     img1 (numpy.ndarray): La primera imagen.
     img2 (numpy.ndarray): La segunda imagen.
 
@@ -44,6 +44,11 @@ def compatibility(img1, img2):
 def login_capture(user_login, user_entry2, screen2):
     ''' 
     Captura la imagen de la cara para el inicio de sesión.
+
+    Parametros:
+    user_login (str): El nombre del usuario que intenta iniciar sesión.
+    user_entry2 (Tkinter.Entry): Entrada de usuario que se limpiará después de la captura.
+    screen2 (Tkinter.Toplevel): La pantalla donde se mostrará el mensaje de resultado.
     '''
     img = f"{user_login}_login.jpg"
     img_path = os.path.join(path, img)
@@ -54,23 +59,28 @@ def login_capture(user_login, user_entry2, screen2):
     user_entry2.delete(0, END)  # Limpiar la entrada
 
     pixels = imageio.imread(img_path)
-    faces = MTCNN().detect_faces(pixels)  # Detectar caras en img
+    faces = MTCNN().detect_faces(pixels)  # Detectar caras en img_path
+
     ut.face(img_path, faces)
     ut.getEnter(screen2)
+
     # Obtiene el usuario de la base de datos
     res_db = db.getUser(user_login, path + "/" + img_user)
 
     if res_db["affected"]:
         my_files = os.listdir()  # Lista los archivos en el directorio actual
         if img_user in my_files:
-            # Comparar utilizando ORB
-            comp_orb = compatibility(cv2.imread(img_user, 0), cv2.imread(img_path, 0))
-            # Comparar utilizando DeepFace
-            verified_deepface, distance_deepface = compatibility_deepface(img_user, img_path)
-            # Comparar utilizando face_recognition
-            verified_face_recognition = compatibility_face_recognition(img_user, img_path)
+            # Comparacion usando ORB
+            comp_orb = compatibility(cv2.imread(
+                img_user, 0), cv2.imread(img_path, 0))
+            # Comparacion usando DeepFace
+            verified_deepface, distance_deepface = compatibility_deepface(
+                img_user, img_path)
+            # Comparacion usando face_recognition
+            verified_face_recognition = compatibility_face_recognition(
+                img_user, img_path)
 
-            # Actualizar las condiciones de acceso
+            # Condiciones de acceso
             if (comp_orb >= 0.95 and (verified_deepface or verified_face_recognition)) or (comp_orb >= 0.90 and verified_deepface and verified_face_recognition):
                 print("{}Compatibilidad ORB: {:.1%}, DeepFace: {}, face_recognition: {}{}".format(
                     color_success, float(comp_orb), verified_deepface, verified_face_recognition, color_normal))
@@ -92,17 +102,19 @@ def compatibility_deepface(img1_path, img2_path):
     ''' 
     Compara dos imágenes de caras usando DeepFace con diferentes modelos.
 
-    Parameters:
+    Parametros:
     img1_path (str): La ruta de la primera imagen.
     img2_path (str): La ruta de la segunda imagen.
 
     Returns:
-    bool: True si alguna verificación es exitosa, False en caso contrario.
+    tuple: Un booleano que indica si alguna verificación es exitosa y la distancia de la coincidencia.
     '''
     models = ['VGG-Face', 'Facenet', 'OpenFace', 'DeepFace', 'DeepID']
     for model in models:
         try:
-            result = DeepFace.verify(img1_path, img2_path, model_name=model, enforce_detection=False)
+            # Verifica las img1_path e img2_path usando DeepFace
+            result = DeepFace.verify(
+                img1_path, img2_path, model_name=model, enforce_detection=False)
             if result["verified"]:
                 return True, result["distance"]
         except Exception as e:
@@ -114,7 +126,7 @@ def compatibility_face_recognition(img1_path, img2_path):
     ''' 
     Compara dos imágenes de caras usando face_recognition.
 
-    Parameters:
+    Parametros:
     img1_path (str): La ruta de la primera imagen.
     img2_path (str): La ruta de la segunda imagen.
 

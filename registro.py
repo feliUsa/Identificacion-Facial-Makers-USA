@@ -15,8 +15,9 @@ def register_face_db(img, screen1):
     ''' 
     Registra la cara en la base de datos.
 
-    Parameters:
+    Parametros:
     img (str): La ruta de la imagen.
+    screen1 (Tkinter.Toplevel): La pantalla donde se mostrará el mensaje de resultado.
     '''
     name_user = img.replace(".jpg", "").replace(".png", "")
     res_bd = db.registerUser(name_user, path + "/" + img)
@@ -33,6 +34,11 @@ def register_face_db(img, screen1):
 def register_capture(user_reg_img, user_entry1, screen1):
     ''' 
     Captura la imagen de la cara para el registro.
+
+    Parametros:
+    user_reg_img (str): Nombre del archivo de imagen para el registro.
+    user_entry1 (Tkinter.Entry): Entrada de usuario que se limpiará después de la captura.
+    screen1 (Tkinter.Toplevel): La pantalla donde se mostrará el mensaje de resultado.
     '''
     img = f"{user_reg_img}.jpg"
     img_path = os.path.join(path, img)
@@ -44,6 +50,7 @@ def register_capture(user_reg_img, user_entry1, screen1):
     pixels = imageio.imread(img_path)
     faces = MTCNN().detect_faces(pixels)
     if faces:
+        # Si se detectan caras, procesa la imagen y registra la cara en la base de datos
         ut.face(img_path, faces)
         register_face_db(img, screen1)
     else:

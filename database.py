@@ -3,11 +3,14 @@ import json
 import logging
 
 # Configuración del logger
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Carga las credenciales de la base de datos desde un archivo JSON
 with open('conexion.json') as json_file:
     keys = json.load(json_file)
+
 
 def convertToBinaryData(filename):
     ''' 
@@ -27,6 +30,7 @@ def convertToBinaryData(filename):
         logger.error(f"Error al convertir archivo a binario: {e}")
         return None
 
+
 def write_file(data, path):
     ''' 
     Escribe datos binarios en un archivo.
@@ -40,6 +44,7 @@ def write_file(data, path):
             file.write(data)
     except Exception as e:
         logger.error(f"Error al escribir archivo: {e}")
+
 
 def registerUser(name, photo):
     ''' 
@@ -73,6 +78,7 @@ def registerUser(name, photo):
             con.close()
     return {"id": id, "affected": inserted}
 
+
 def getUser(name, path):
     ''' 
     Obtiene un usuario de la base de datos.
@@ -105,12 +111,20 @@ def getUser(name, path):
             con.close()
     return {"id": id, "affected": rows}
 
+
 def get_db_connection():
+    ''' 
+    Establece y devuelve una conexión a la base de datos.
+
+    Return:
+    connection: La conexión a la base de datos o None si ocurre un error.
+    '''
+
     try:
         connection = db.connect(
-            host=keys["host"], 
-            user=keys["user"], 
-            password=keys["password"], 
+            host=keys["host"],
+            user=keys["user"],
+            password=keys["password"],
             database=keys["database"]
         )
         return connection

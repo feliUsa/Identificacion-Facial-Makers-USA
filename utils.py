@@ -20,7 +20,7 @@ def getEnter(screen):
     ''' 
     Agrega un espacio en la pantalla.
 
-    Parameters:
+    Parametros:
     screen (Tkinter.Toplevel): La pantalla donde se agregará el espacio.
     '''
     Label(screen, text="", bg=color_background).pack()
@@ -60,14 +60,14 @@ def configure_screen(screen, text):
         font_label, 18), width="500", height="2").pack()
 
 
-def credentials(screen, var, flag, command):
+def credentials(screen, var, command):
     ''' 
     Configura la entrada de usuario.
 
     Parametros:
     screen (Tkinter.Toplevel): La pantalla donde se configurará la entrada.
     var (Tkinter.StringVar): Variable para almacenar el valor ingresado.
-    command: Eepecifica el comando dependiendo de si es registro o ingreso al sistema
+    command (function): Especifica el comando dependiendo de si es registro o ingreso al sistema.
 
     Return:
     Tkinter.Entry: La entrada de usuario configurada.
@@ -95,11 +95,12 @@ def face(img, faces):
     '''
     data = imageio.imread(img)
     for i, face in enumerate(faces):
-        x1, y1, width, height = face["box"]
+        x1, y1, width, height = face["box"]  # Obtener coordenadas del rostro
         x2, y2 = x1 + width, y1 + height
+        # Identifica y recorta la cara en la imagen completa
         cropped_face = data[y1:y2, x1:x2]
         resized_face = cv2.resize(
-            cropped_face, (150, 200), interpolation=cv2.INTER_CUBIC)
+            cropped_face, (150, 200), interpolation=cv2.INTER_CUBIC)  # Redimensiona
         cv2.imwrite(f"{img}_face_{i}.jpg", resized_face)
 
 
@@ -119,15 +120,15 @@ def capture_image(window_name, img_path):
         if not ret:
             print("Error al acceder a la cámara.")
             break
-        
+
         cv2.imshow(window_name, frame)
 
         key = cv2.waitKey(1) & 0xFF
-        if key == 32:  # Código de la tecla Espacio
+        if key == 32:  # Espacio
             cv2.imwrite(img_path, frame)
             print(f"Imagen guardada en {img_path}")
             break
-        elif key == 27:  # Código de la tecla ESC
+        elif key == 27:  # ESC
             print("Captura cancelada.")
             break
 
